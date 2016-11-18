@@ -58,6 +58,7 @@
 
     <modules>
         <module>client</module>
+        <module>client-test</module>
         <module>model</module>
         <module>model-test</module>
     </modules>
@@ -80,6 +81,11 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jdk8</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
@@ -94,6 +100,11 @@
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>${javax.ws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.spals.oembed4j</groupId>
+                <artifactId>spals-oembed4j-client</artifactId>
+                <version>${spals.oembed4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.spals.oembed4j</groupId>

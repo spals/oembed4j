@@ -2,6 +2,7 @@ package net.spals.oembed4j.client.parser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import net.spals.oembed4j.model.OEmbedFormat;
 import net.spals.oembed4j.model.OEmbedRequest;
 import net.spals.oembed4j.model.OEmbedResponse;
@@ -20,8 +21,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class OEmbedResponseParser {
 
-    private static final ObjectMapper jsonMapper = new ObjectMapper();
-    private static final XmlMapper xmlMapper = new XmlMapper();
+    private static final ObjectMapper jsonMapper = new ObjectMapper()
+            .registerModule(new Jdk8Module());
+    private static final ObjectMapper xmlMapper = new XmlMapper()
+            .registerModule(new Jdk8Module());
 
     /**
      * Parse the given response {@link InputStream} which is paired with

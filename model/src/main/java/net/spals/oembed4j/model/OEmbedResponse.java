@@ -69,8 +69,8 @@ public interface OEmbedResponse {
     @JacksonXmlProperty(localName = "thumbnail_width")
     Optional<Integer> getThumbnailWidth();
 
-    @JsonProperty("type")
-    @JacksonXmlProperty(localName = "type")
+    @JsonProperty("title")
+    @JacksonXmlProperty(localName = "title")
     Optional<String> getTitle();
 
     // ========== Required fields by type ==========

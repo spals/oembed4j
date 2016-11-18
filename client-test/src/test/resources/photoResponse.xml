@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<oembed>
+    <type>photo</type>
+    <height>1</height>
+    <url>https://www.example.com/myphoto.jpg</url>
+    <width>2</width>
+</oembed>
