@@ -73,7 +73,7 @@ public interface OEmbedResponse {
     @JacksonXmlProperty(localName = "type")
     Optional<String> getTitle();
 
-    // ========== Optional fields by type ==========
+    // ========== Required fields by type ==========
     @JsonProperty("height")
     @JacksonXmlProperty(localName = "height")
     Optional<Integer> getHeight();
@@ -102,7 +102,7 @@ public interface OEmbedResponse {
 
         @Override
         public OEmbedResponse build() {
-            // Check optional fields by type
+            // Check required fields by type
             switch(getType()) {
                 case photo:
                     checkState(getUrl().isPresent(), "Source url is required for %s content", getType());

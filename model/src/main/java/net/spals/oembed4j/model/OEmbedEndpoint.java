@@ -7,6 +7,7 @@ import com.google.common.collect.Iterables;
 import org.inferred.freebuilder.FreeBuilder;
 
 import java.net.URI;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -57,8 +58,6 @@ public interface OEmbedEndpoint {
 
         public Builder() {
             setDiscoveryEnabled(false);
-            // By default, support all formats
-            addSupportedFormats(OEmbedFormat.values());
         }
 
         @Override
@@ -73,7 +72,10 @@ public interface OEmbedEndpoint {
 
         @Override
         public OEmbedEndpoint build() {
-            checkState(!getSupportedFormats().isEmpty(), "OEmbedEndpoint must contain at least one supported format");
+            // By default, support all formats
+            if (getSupportedFormats().isEmpty()) {
+                super.addAllSupportedFormats(EnumSet.allOf(OEmbedFormat.class));
+            }
             // We don't really care which format is used since any response will get
             // deserialized into an OEmbedResponse bean anyway. The only important thing
             // is that we use a format supported by the endpoint. So use the DEFAULT_FORMAT

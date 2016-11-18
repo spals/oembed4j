@@ -34,4 +34,16 @@ public class OEmbedRequestTest {
 
         assertThat(request.toURI(endpoint), is(expectedURI));
     }
+
+    @Test
+    public void testToURIWithMaxHeightAndMaxWidth() {
+        final OEmbedEndpoint endpoint = new OEmbedEndpoint.Builder().addSchemeTemplates("https://www.example.com/*")
+                .setURITemplate("http://www.youtube.com/oembed").build();
+        final OEmbedRequest request = new OEmbedRequest.Builder()
+                .setResourceURI(URI.create("https://www.example.com/"))
+                .setMaxHeight(1).setMaxWidth(2).build();
+
+        assertThat(request.toURI(endpoint),
+                is(URI.create("http://www.youtube.com/oembed?format=json&maxheight=1&maxwidth=2&url=https%3A%2F%2Fwww.example.com%2F")));
+    }
 }

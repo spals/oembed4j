@@ -13,6 +13,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>eu.codearte.catch-exception</groupId>
+            <artifactId>catch-exception</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.spals.oembed4j</groupId>
             <artifactId>spals-oembed4j-model</artifactId>
         </dependency>
