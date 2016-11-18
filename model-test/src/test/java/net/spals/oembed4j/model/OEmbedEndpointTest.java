@@ -15,6 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 /**
+ * Unit tests for {@link OEmbedEndpoint}
+ *
  * @author tkral
  */
 public class OEmbedEndpointTest {
@@ -29,23 +31,7 @@ public class OEmbedEndpointTest {
     }
 
     @DataProvider
-    Object[][] getURIProvider() {
-        return new Object[][] {
-                {"https://vimeo.com/api/oembed.{format}",
-                        URI.create("https://vimeo.com/api/oembed.json?url=https%3A%2F%2Fwww.example.com")},
-                {"http://www.youtube.com/oembed",
-                        URI.create("http://www.youtube.com/oembed?format=json&url=https%3A%2F%2Fwww.example.com")},
-        };
-    }
-
-    @Test(dataProvider = "getURIProvider")
-    public void testGetURI(final String uriTemplate, final URI expectedURI) {
-        final OEmbedEndpoint endpoint = new OEmbedEndpoint.Builder().setURITemplate(uriTemplate).buildPartial();
-        assertThat(endpoint.getURI(OEmbedFormat.json, URI.create("https://www.example.com")), is(expectedURI));
-    }
-
-    @DataProvider
-    Object[][] matchesResourceURIProvider() {
+    Object[][] matchesURIProvider() {
         return new Object[][] {
                 {ImmutableList.of("https://vimeo.com/album/*/video/*"), URI.create("https://vimeo.com/album/1/video/2"), true},
                 {ImmutableList.of("https://vimeo.com/album/*/video/*"), URI.create("https://vimeo.com/album/1/deadbeef/2"), false},
@@ -56,10 +42,10 @@ public class OEmbedEndpointTest {
         };
     }
 
-    @Test(dataProvider = "matchesResourceURIProvider")
-    public void testMatchesResourceURI(final List<String> schemeTemplates, final URI resourceURI, final boolean expectedResult) {
+    @Test(dataProvider = "matchesURIProvider")
+    public void testMatchesURI(final List<String> schemeTemplates, final URI resourceURI, final boolean expectedResult) {
         final OEmbedEndpoint endpoint = new OEmbedEndpoint.Builder().setURITemplate("https://www.example.com/oembed")
                 .addAllSchemeTemplates(schemeTemplates).build();
-        assertThat(endpoint.matchesResourceURI(resourceURI), is(expectedResult));
+        assertThat(endpoint.matchesURI(resourceURI), is(expectedResult));
     }
 }

@@ -21,7 +21,15 @@ import java.util.stream.Collectors;
 /**
  * Default implementation of {@link OEmbedRegistry}.
  *
+ * To create a registry dynamically from the official oEmbed
+ * provider list, you can use the following:
  *
+ * {@code DefaultOEmbedRegistry.loadFromURI(DEFAULT_OEMBED_PROVIDER_URI)}
+ *
+ * Otherwise, you can use an alternative provider list uri
+ * or local file with the appropriate static initializer.
+ *
+ * NOTE: Any provider list is assumed to be in JSON format.
  *
  * @author tkral
  */
@@ -62,11 +70,9 @@ public final class DefaultOEmbedRegistry implements OEmbedRegistry {
                 .collect(Collectors.toMap(OEmbedProvider::getDomain, Function.identity())));
     }
 
-    @Override
-    public Optional<OEmbedProvider> getProvider(final String name) {
-        return Optional.ofNullable(providersByName.get(name));
-    }
-
+    /**
+     * @see OEmbedRegistry#getEndpoint(URI)
+     */
     @Override
     public Optional<OEmbedEndpoint> getEndpoint(final URI resourceURI) {
         final InternetDomainName resourceDomain = InternetDomainName.from(resourceURI.getHost());
@@ -85,6 +91,17 @@ public final class DefaultOEmbedRegistry implements OEmbedRegistry {
                 .filter(endpoint -> endpoint.matchesURI(resourceURI)).findAny();
     }
 
+    /**
+     * @see OEmbedRegistry#getProvider(String)
+     */
+    @Override
+    public Optional<OEmbedProvider> getProvider(final String name) {
+        return Optional.ofNullable(providersByName.get(name));
+    }
+
+    /**
+     * @see OEmbedRegistry#numProviders()
+     */
     @Override
     public int numProviders() {
         return providersByName.size();

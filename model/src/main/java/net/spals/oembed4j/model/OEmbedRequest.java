@@ -39,5 +39,10 @@ public interface OEmbedRequest {
         return uriBuilder.queryParam("url", getResourceURI()).build();
     }
 
-    class Builder extends OEmbedRequest_Builder {  }
+    class Builder extends OEmbedRequest_Builder {
+
+        public Builder() {
+            setFormat(DEFAULT_FORMAT);
+        }
+    }
 }
