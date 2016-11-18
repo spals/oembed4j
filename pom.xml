@@ -7,7 +7,6 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>oEmbed4J</name>
     <description>
         A Java implementation of the oEmbed specification.
     </description>
@@ -107,6 +106,11 @@
                 <version>${jersey.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-common</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.hamcrest</groupId>
                 <artifactId>java-hamcrest</artifactId>
                 <version>${hamcrest.version}</version>
@@ -119,7 +123,7 @@
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
+                <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>

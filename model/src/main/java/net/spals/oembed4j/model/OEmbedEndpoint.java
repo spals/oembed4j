@@ -3,15 +3,16 @@ package net.spals.oembed4j.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.collect.Iterables;
 import org.inferred.freebuilder.FreeBuilder;
 
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A Java bean representation of an oEmbed endpoint.
@@ -26,7 +27,12 @@ public interface OEmbedEndpoint {
     boolean getDiscoveryEnabled();
 
     @JsonProperty("formats")
-    Set<OEmbedFormat> getFormats();
+    Set<OEmbedFormat> getSupportedFormats();
+
+    // Derived field which returns a default format
+    // for this endpoint.
+    @JsonIgnore
+    OEmbedFormat getDefaultFormat();
 
     @JsonProperty("schemes")
     List<String> getSchemeTemplates();
@@ -47,21 +53,44 @@ public interface OEmbedEndpoint {
 
     class Builder extends OEmbedEndpoint_Builder {
 
+        private static final OEmbedFormat DEFAULT_FORMAT = OEmbedFormat.json;
+
         public Builder() {
             setDiscoveryEnabled(false);
             // By default, support all formats
-            addFormats(OEmbedFormat.values());
+            addSupportedFormats(OEmbedFormat.values());
+        }
+
+        @Override
+        public Builder setDefaultFormat(final OEmbedFormat defaultFormat) {
+            throw new UnsupportedOperationException("Default format is a derived field and cannot be set manually");
+        }
+
+        @Override
+        public Builder addSchemePatterns(final Pattern schemePattern) {
+            throw new UnsupportedOperationException("Scheme patterns are derived fields and cannot be set manually");
         }
 
         @Override
         public OEmbedEndpoint build() {
+            checkState(!getSupportedFormats().isEmpty(), "OEmbedEndpoint must contain at least one supported format");
+            // We don't really care which format is used since any response will get
+            // deserialized into an OEmbedResponse bean anyway. The only important thing
+            // is that we use a format supported by the endpoint. So use the DEFAULT_FORMAT
+            // if it's supported, otherwise, just grab the first format in the supported set.
+            super.setDefaultFormat(getSupportedFormats().stream()
+                .filter(supportedFormat -> supportedFormat == DEFAULT_FORMAT).findFirst()
+                .orElseGet(() -> Iterables.getFirst(getSupportedFormats(), DEFAULT_FORMAT)));
+
+            checkState(!getSchemeTemplates().isEmpty(), "OEmbedEndpoint must contain at least one scheme template");
             // Scheme patterns are 100% derived from the scheme templates.
             // We will completely ignore any scheme patterns set manually in the builder.
-            clearSchemePatterns();
-            addAllSchemePatterns(getSchemeTemplates().stream()
+            super.clearSchemePatterns();
+            getSchemeTemplates().stream()
                     .map(schemeTemplate -> schemeTemplate.replaceAll("\\*", "(.*)"))
-                    .map(schemaPatterStr -> Pattern.compile(schemaPatterStr))
-                    .collect(Collectors.toList()));
+                    .map(schemePatterStr -> Pattern.compile(schemePatterStr))
+                    .collect(Collectors.toList())
+                    .forEach(schemePattern -> super.addSchemePatterns(schemePattern));
             return super.build();
         }
     }

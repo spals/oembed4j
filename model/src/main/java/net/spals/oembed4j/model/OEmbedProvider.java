@@ -33,10 +33,15 @@ public interface OEmbedProvider {
     class Builder extends OEmbedProvider_Builder {
 
         @Override
+        public Builder setDomain(final InternetDomainName domain) {
+            throw new UnsupportedOperationException("Domain is a derived field and cannot be set manually");
+        }
+
+        @Override
         public OEmbedProvider build() {
             // The provider domain is 100% derived from the provider uri.
             // We will completely ignore any domain set manually in the builder.
-            setDomain(InternetDomainName.from(getURI().getHost()));
+            super.setDomain(InternetDomainName.from(getURI().getHost()));
             return super.build();
         }
     }

@@ -26,7 +26,7 @@ public class OEmbedEndpointTest {
         final OEmbedEndpoint endpoint = new ObjectMapper()
                 .readValue(Resources.getResource(OEmbedEndpointTest.class, "/endpoint.json"), OEmbedEndpoint.class);
         assertThat(endpoint.getDiscoveryEnabled(), is(true));
-        assertThat(endpoint.getFormats(), is(EnumSet.allOf(OEmbedFormat.class)));
+        assertThat(endpoint.getSupportedFormats(), is(EnumSet.allOf(OEmbedFormat.class)));
         assertThat(endpoint.getURITemplate(), is("https://vimeo.com/api/oembed.{format}"));
     }
 
