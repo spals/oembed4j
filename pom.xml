@@ -46,6 +46,7 @@
         <guava.version>19.0</guava.version>
         <jackson.version>2.7.8</jackson.version>
         <javax.ws.version>2.0.1</javax.ws.version>
+        <jersey.version>2.23.1</jersey.version>
         <mockito.version>2.2.20</mockito.version>
         <spals.oembed4j.version>1.0.0</spals.oembed4j.version>
         <testng.version>6.9.10</testng.version>
@@ -57,6 +58,7 @@
     </properties>
 
     <modules>
+        <module>client</module>
         <module>model</module>
         <module>model-test</module>
     </modules>
@@ -98,6 +100,11 @@
                 <groupId>net.spals.oembed4j</groupId>
                 <artifactId>spals-oembed4j-model</artifactId>
                 <version>${spals.oembed4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${jersey.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>

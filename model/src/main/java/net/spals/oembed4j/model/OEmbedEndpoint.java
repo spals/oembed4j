@@ -39,18 +39,9 @@ public interface OEmbedEndpoint {
     String getURITemplate();
 
     @JsonIgnore
-    default URI getURI(final OEmbedFormat format, final URI resourceURI) {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(getURITemplate());
-        return Optional.of(getURITemplate())
-                .filter(uriTemplate -> uriTemplate.contains("format"))
-                .map(uriTemplate -> uriBuilder.queryParam("url", resourceURI).build(format))
-                .orElseGet(() -> uriBuilder.queryParam("format", format).queryParam("url", resourceURI).build());
-    }
-
-    @JsonIgnore
-    default boolean matchesResourceURI(final URI resourceURI) {
+    default boolean matchesURI(final URI uri) {
         return getSchemePatterns().stream()
-                .filter(pattern -> pattern.matcher(resourceURI.toString()).matches())
+                .filter(pattern -> pattern.matcher(uri.toString()).matches())
                 .findAny().isPresent();
     }
 
