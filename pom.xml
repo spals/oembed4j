@@ -45,6 +45,7 @@
         <freebuilder.version>1.10.6</freebuilder.version>
         <guava.version>19.0</guava.version>
         <jackson.version>2.7.8</jackson.version>
+        <javax.ws.version>2.0.1</javax.ws.version>
         <mockito.version>2.2.20</mockito.version>
         <testng.version>6.9.13.6</testng.version>
         <hamcrest.version>2.0.0.0</hamcrest.version>
@@ -66,6 +67,11 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
@@ -75,6 +81,11 @@
             <artifactId>catch-exception</artifactId>
             <version>${catch-exception.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>${javax.ws.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
