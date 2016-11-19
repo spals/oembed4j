@@ -21,6 +21,10 @@
             <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
         <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>expiringmap</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.spals.oembed4j</groupId>
             <artifactId>spals-oembed4j-model</artifactId>
         </dependency>

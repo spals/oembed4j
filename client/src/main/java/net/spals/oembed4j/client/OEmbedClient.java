@@ -1,5 +1,6 @@
 package net.spals.oembed4j.client;
 
+import net.spals.oembed4j.client.cache.OEmbedResponseCache;
 import net.spals.oembed4j.model.OEmbedEndpoint;
 import net.spals.oembed4j.model.OEmbedRequest;
 import net.spals.oembed4j.model.OEmbedResponse;
@@ -16,8 +17,16 @@ import java.util.Optional;
 public interface OEmbedClient extends AutoCloseable {
 
     /**
+     * @see AutoCloseable#close()
+     */
+    void close();
+
+    /**
      * Finds a matching {@link OEmbedEndpoint} for the given
      * {@link OEmbedRequest} and executes the request against it.
+     *
+     * This method will check the {@link OEmbedResponseCache}
+     * for a result before executing the request.
      *
      * @param request A {@link OEmbedRequest} which represents
      *                the resource for which we wish to get oEmbed
@@ -27,6 +36,8 @@ public interface OEmbedClient extends AutoCloseable {
      *         be successfully executed.
      */
     Optional<OEmbedResponse> execute(OEmbedRequest request);
+
+    Optional<OEmbedResponse> executeSkipCache(OEmbedRequest request);
 
     /**
      * Executes the given {@link OEmbedRequest} against the given
@@ -41,5 +52,5 @@ public interface OEmbedClient extends AutoCloseable {
      *         Otherwise, {@code Optional.empty()}, if the request cannot
      *         be successfully executed.
      */
-    Optional<OEmbedResponse> execute(OEmbedRequest request, OEmbedEndpoint endpoint);
+    Optional<OEmbedResponse> executeSkipCache(OEmbedRequest request, OEmbedEndpoint endpoint);
 }
