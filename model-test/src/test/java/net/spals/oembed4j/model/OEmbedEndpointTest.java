@@ -38,12 +38,10 @@ public class OEmbedEndpointTest {
         return new Object[][] {
                 // Case: No supported formats explicitly set
                 {new OEmbedEndpoint.Builder()
-                        .addSchemeTemplates("https://www.example.com")
                         .setURITemplate("https://www.example.com/oembed/"), OEmbedFormat.json},
                 // Case: Explicitly set supported format
                 {new OEmbedEndpoint.Builder()
                         .addSupportedFormats(OEmbedFormat.xml)
-                        .addSchemeTemplates("https://www.example.com")
                         .setURITemplate("https://www.example.com/oembed/"), OEmbedFormat.xml},
         };
     }
@@ -86,7 +84,46 @@ public class OEmbedEndpointTest {
     }
 
     @DataProvider
-    Object[][] matchesURIProvider() {
+    Object[][] uriDomainDerivedProvider() {
+        return new Object[][] {
+                {"https://www.example.com/oembed", "www.example.com"},
+                {"https://www.example.com/oembed.{format}", "www.example.com"},
+                {"https://*.example.com/oembed", "(.*).example.com"},
+        };
+    }
+
+    @Test(dataProvider = "uriDomainDerivedProvider")
+    public void testURIDomainPatternDerived(final String uriTemplate,
+                                     final String expectedURIDomainPattern) {
+        final OEmbedEndpoint endpoint = new OEmbedEndpoint.Builder()
+                .setURITemplate(uriTemplate).build();
+        assertThat(endpoint.getURIDomainPattern().pattern(), is(expectedURIDomainPattern));
+    }
+
+    @Test
+    public void testURIDomainPatternManual() {
+        catchException(new OEmbedEndpoint.Builder()).setURIDomainPattern(Pattern.compile(".*"));
+        assertThat(caughtException(), instanceOf(UnsupportedOperationException.class));
+    }
+
+    @DataProvider
+    Object[][] domainMatchesResourceURIProvider() {
+        return new Object[][] {
+                {"https://www.example.com/oembed", URI.create("https://www.example.com/myphoto.jpg"), true},
+                {"https://www.example.com/oembed", URI.create("http://www.example.com/myphoto.jpg"), true},
+                {"https://www.example.com/oembed", URI.create("https://subdomain.example.com/myphoto.jpg"), false},
+                {"https://*.example.com/oembed", URI.create("https://subdomain.example.com/myphoto.jpg"), true},
+        };
+    }
+
+    @Test(dataProvider = "domainMatchesResourceURIProvider")
+    public void testDomainMatchesResourceURI(final String uriTemplate, final URI resourceURI, final boolean expectedResult) {
+        final OEmbedEndpoint endpoint = new OEmbedEndpoint.Builder().setURITemplate(uriTemplate).build();
+        assertThat(endpoint.matchesResourceURI(resourceURI), is(expectedResult));
+    }
+
+    @DataProvider
+    Object[][] schemeMatchesResourceURIProvider() {
         return new Object[][] {
                 {ImmutableList.of("https://vimeo.com/album/*/video/*"), URI.create("https://vimeo.com/album/1/video/2"), true},
                 {ImmutableList.of("https://vimeo.com/album/*/video/*"), URI.create("https://vimeo.com/album/1/deadbeef/2"), false},
@@ -97,10 +134,10 @@ public class OEmbedEndpointTest {
         };
     }
 
-    @Test(dataProvider = "matchesURIProvider")
-    public void testMatchesURI(final List<String> schemeTemplates, final URI resourceURI, final boolean expectedResult) {
+    @Test(dataProvider = "schemeMatchesResourceURIProvider")
+    public void testSchemeMatchesResourceURI(final List<String> schemeTemplates, final URI resourceURI, final boolean expectedResult) {
         final OEmbedEndpoint endpoint = new OEmbedEndpoint.Builder().setURITemplate("https://www.example.com/oembed")
                 .addAllSchemeTemplates(schemeTemplates).build();
-        assertThat(endpoint.matchesURI(resourceURI), is(expectedResult));
+        assertThat(endpoint.matchesResourceURI(resourceURI), is(expectedResult));
     }
 }

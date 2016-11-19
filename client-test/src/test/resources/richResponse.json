@@ -1,0 +1,6 @@
+{
+  "type": "rich",
+  "height": 1,
+  "html": "<script async src=\"https://www.example.com/myscript.js\"></script>",
+  "width": 2
+}

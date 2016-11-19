@@ -24,7 +24,7 @@ public interface OEmbedRequest {
     Optional<Integer> getMaxWidth();
 
     default URI toURI(final OEmbedEndpoint endpoint) {
-        checkArgument(endpoint.matchesURI(getResourceURI()),
+        checkArgument(endpoint.matchesResourceURI(getResourceURI()),
                 "OEmbedEndpoint (%s) does not have a matching scheme for resource URI %s",
                 endpoint.getURITemplate(), getResourceURI());
 

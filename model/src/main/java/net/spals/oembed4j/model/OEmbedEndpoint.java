@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.Iterables;
+import com.google.common.net.InternetDomainName;
 import org.inferred.freebuilder.FreeBuilder;
 
 import java.net.URI;
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -45,10 +47,20 @@ public interface OEmbedEndpoint {
     @JsonProperty("url")
     String getURITemplate();
 
+    // Derived field for default pattern matching
     @JsonIgnore
-    default boolean matchesURI(final URI uri) {
+    Pattern getURIDomainPattern();
+
+    @JsonIgnore
+    default boolean matchesResourceURI(final URI resourceURI) {
+        // If there are no scheme patterns to check, then
+        // fallback to comparing the URI domains
+        if (getSchemePatterns().isEmpty()) {
+            return getURIDomainPattern().matcher(resourceURI.getHost()).matches();
+        }
+
         return getSchemePatterns().stream()
-                .filter(pattern -> pattern.matcher(uri.toString()).matches())
+                .filter(pattern -> pattern.matcher(resourceURI.toString()).matches())
                 .findAny().isPresent();
     }
 
@@ -71,6 +83,11 @@ public interface OEmbedEndpoint {
         }
 
         @Override
+        public Builder setURIDomainPattern(final Pattern uriDomainPattern) {
+            throw new UnsupportedOperationException("URI domain is a derived field and cannot be set manually");
+        }
+
+        @Override
         public OEmbedEndpoint build() {
             // By default, support all formats
             if (getSupportedFormats().isEmpty()) {
@@ -84,7 +101,6 @@ public interface OEmbedEndpoint {
                 .filter(supportedFormat -> supportedFormat == DEFAULT_FORMAT).findFirst()
                 .orElseGet(() -> Iterables.getFirst(getSupportedFormats(), DEFAULT_FORMAT)));
 
-            checkState(!getSchemeTemplates().isEmpty(), "OEmbedEndpoint must contain at least one scheme template");
             // Scheme patterns are 100% derived from the scheme templates.
             // We will completely ignore any scheme patterns set manually in the builder.
             super.clearSchemePatterns();
@@ -93,6 +109,15 @@ public interface OEmbedEndpoint {
                     .map(schemePatterStr -> Pattern.compile(schemePatterStr))
                     .collect(Collectors.toList())
                     .forEach(schemePattern -> super.addSchemePatterns(schemePattern));
+
+            // URI domain pattern is derived from the URI template
+            checkNotNull(getURITemplate(), "A non-empty URI template is required for an oEmbed endpoint");
+            checkState(!getURITemplate().isEmpty(), "A non-empty URI template is required for an oEmbed endpoint");
+            final String[] parsedURITemplate = getURITemplate().split("://");
+            final String uriTemplateWithoutSchema = parsedURITemplate[parsedURITemplate.length - 1];
+            final String uriTemplateHost = uriTemplateWithoutSchema.split("/")[0];
+            super.setURIDomainPattern(Pattern.compile(uriTemplateHost.replaceAll("\\*", "(.*)")));
+
             return super.build();
         }
     }

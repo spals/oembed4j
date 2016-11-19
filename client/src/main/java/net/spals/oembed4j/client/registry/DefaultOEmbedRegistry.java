@@ -80,7 +80,7 @@ public final class DefaultOEmbedRegistry implements OEmbedRegistry {
         // provider by the domain. This will cover a lot of cases, but not every case.
         final Optional<OEmbedProvider> providerByDomain = Optional.ofNullable(providersByDomain.get(resourceDomain));
         final Optional<OEmbedEndpoint> endpointByDomain = providerByDomain.map(OEmbedProvider::getEndpoints)
-                .flatMap(endpoints -> endpoints.stream().filter(endpoint -> endpoint.matchesURI(resourceURI)).findAny());
+                .flatMap(endpoints -> endpoints.stream().filter(endpoint -> endpoint.matchesResourceURI(resourceURI)).findAny());
         if (endpointByDomain.isPresent()) {
             return endpointByDomain;
         }
@@ -88,7 +88,7 @@ public final class DefaultOEmbedRegistry implements OEmbedRegistry {
         // Fallback to a linear search through all registered endpoints
         return providersByName.values().stream()
                 .flatMap(provider -> provider.getEndpoints().stream())
-                .filter(endpoint -> endpoint.matchesURI(resourceURI)).findAny();
+                .filter(endpoint -> endpoint.matchesResourceURI(resourceURI)).findAny();
     }
 
     /**
