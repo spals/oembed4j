@@ -3,6 +3,8 @@ package net.spals.oembed4j.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.net.InternetDomainName;
 import org.inferred.freebuilder.FreeBuilder;
@@ -106,6 +108,13 @@ public interface OEmbedEndpoint {
             super.clearSchemePatterns();
             getSchemeTemplates().stream()
                     .map(schemeTemplate -> schemeTemplate.replaceAll("\\*", "(.*)"))
+                    // Sigh. Some providers list only http:// schemes when
+                    // their endpoints will also accept https:// so a straight
+                    // scheme match will miss these cases. So we'll err on the
+                    // permissive side, by checking for https:// in those cases
+                    // as well. Worst case is we send the request and it's rejected.
+                    .flatMap(schemePatternStr ->
+                            ImmutableSet.of(schemePatternStr, schemePatternStr.replaceFirst("http:", "https:")).stream())
                     .map(schemePatterStr -> Pattern.compile(schemePatterStr))
                     .collect(Collectors.toList())
                     .forEach(schemePattern -> super.addSchemePatterns(schemePattern));

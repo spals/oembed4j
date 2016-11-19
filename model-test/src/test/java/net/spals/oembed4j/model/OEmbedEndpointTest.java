@@ -2,6 +2,7 @@ package net.spals.oembed4j.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -10,7 +11,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -61,20 +64,23 @@ public class OEmbedEndpointTest {
     @DataProvider
     Object[][] schemePatternDerivedProvider() {
         return new Object[][] {
-                {"https://www.example.com/*", "https://www.example.com/(.*)"},
-                {"https://www.example.com/*/*", "https://www.example.com/(.*)/(.*)"},
-                {"https://www.example.com/*/path/*", "https://www.example.com/(.*)/path/(.*)"},
+                {"https://www.example.com/*", ImmutableSet.of("https://www.example.com/(.*)")},
+                {"https://www.example.com/*/*", ImmutableSet.of("https://www.example.com/(.*)/(.*)")},
+                {"https://www.example.com/*/path/*", ImmutableSet.of("https://www.example.com/(.*)/path/(.*)")},
+                {"http://www.example.com/*", ImmutableSet.of("http://www.example.com/(.*)", "https://www.example.com/(.*)")},
         };
     }
 
     @Test(dataProvider = "schemePatternDerivedProvider")
-    public void testSchemePatternDerived(final String schemeTemplate, final String expectedSchemePattern) {
+    public void testSchemePatternDerived(final String schemeTemplate,
+                                         final Set<String> expectedSchemePattern) {
         final OEmbedEndpoint endpoint = new OEmbedEndpoint.Builder()
                 .addSchemeTemplates(schemeTemplate)
                 .setURITemplate("https://www.example.com/oembed")
                 .build();
-        assertThat(endpoint.getSchemePatterns(), hasSize(1));
-        assertThat(endpoint.getSchemePatterns().get(0).pattern(), is(expectedSchemePattern));
+        assertThat(endpoint.getSchemePatterns().stream()
+                .map(schemePattern -> schemePattern.pattern())
+                .collect(Collectors.toSet()), is(expectedSchemePattern));
     }
 
     @Test
