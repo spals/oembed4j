@@ -48,7 +48,7 @@ public class JerseyOEmbedClientTest {
         };
     }
 
-    @Test(enabled = false, dataProvider = "executeProvider")
+    @Test(dataProvider = "executeProvider")
     public void testExecute(final URI resourceURI,
                             final OEmbedResponse expectedResponse) {
         final OEmbedRequest request = new OEmbedRequest.Builder().setResourceURI(resourceURI).build();
@@ -114,7 +114,7 @@ public class JerseyOEmbedClientTest {
                 .setWidth(640)
                 .putCustomProperties("description", "Short legs. Big city.\n\nhttps://www.instagram.com/madmax_fluffyroad/\n\nmade by: bryan reisberg (& Maxine's owner)\ncamera: owen levelle\nvoice: jon st. john")
                 .putCustomProperties("duration", 34)
-                .putCustomProperties("is_plus", 0)
+                .putCustomProperties("is_plus", "0")
                 .putCustomProperties("thumbnail_url_with_play_button", "https://i.vimeocdn.com/filter/overlay?src0=https%3A%2F%2Fi.vimeocdn.com%2Fvideo%2F600355807_640.jpg&src1=http%3A%2F%2Ff.vimeocdn.com%2Fp%2Fimages%2Fcrawler_play.png")
                 .putCustomProperties("upload_date", "2016-11-01 10:40:37")
                 .putCustomProperties("uri", "/videos/189789787")

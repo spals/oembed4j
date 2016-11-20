@@ -39,11 +39,41 @@ public final class JerseyOEmbedClient implements OEmbedClient {
         }
 
         @Override
-        public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) {  }
+        public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) {
+        }
 
         @Override
-        public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) {  }
+        public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) {
+        }
     };
+    private final Client client;
+    private final OEmbedRegistry registry;
+    private final OEmbedResponseCache responseCache;
+    private final OEmbedResponseParser responseParser;
+
+    @VisibleForTesting
+    JerseyOEmbedClient(
+        final Client client,
+        final OEmbedRegistry registry
+    ) {
+        this.client = client;
+        this.registry = registry;
+        this.responseCache = OEmbedResponseCache.create(this);
+        this.responseParser = new OEmbedResponseParser();
+    }
+
+    @VisibleForTesting
+    JerseyOEmbedClient(
+        final Client client,
+        final OEmbedRegistry registry,
+        final OEmbedResponseCache responseCache,
+        final OEmbedResponseParser responseParser
+    ) {
+        this.client = client;
+        this.registry = registry;
+        this.responseCache = responseCache;
+        this.responseParser = responseParser;
+    }
 
     public static JerseyOEmbedClient create(final OEmbedRegistry registry) {
         try {
@@ -51,7 +81,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
             // Setup SSL management
             // TODO: DO we need some real SSL management?
             final SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null /*KeyManagers*/, new TrustManager[] {DEFAULT_TRUST_MANAGER}, new SecureRandom());
+            sslContext.init(null /*KeyManagers*/, new TrustManager[]{DEFAULT_TRUST_MANAGER}, new SecureRandom());
 
             final ClientBuilder clientBuilder = ClientBuilder.newBuilder();
             clientBuilder.sslContext(sslContext).hostnameVerifier((s, sslSession) -> true);
@@ -61,31 +91,6 @@ public final class JerseyOEmbedClient implements OEmbedClient {
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
-    }
-
-    private final Client client;
-    private final OEmbedRegistry registry;
-    private final OEmbedResponseCache responseCache;
-    private final OEmbedResponseParser responseParser;
-
-    @VisibleForTesting
-    JerseyOEmbedClient(final Client client,
-                       final OEmbedRegistry registry) {
-        this.client = client;
-        this.registry = registry;
-        this.responseCache = OEmbedResponseCache.create(this);
-        this.responseParser = new OEmbedResponseParser();
-    }
-
-    @VisibleForTesting
-    JerseyOEmbedClient(final Client client,
-                       final OEmbedRegistry registry,
-                       final OEmbedResponseCache responseCache,
-                       final OEmbedResponseParser responseParser) {
-        this.client = client;
-        this.registry = registry;
-        this.responseCache = responseCache;
-        this.responseParser = responseParser;
     }
 
     /**
@@ -110,7 +115,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
     @Override
     public Optional<OEmbedResponse> executeSkipCache(final OEmbedRequest request) {
         return registry.getEndpoint(request.getResourceURI())
-                .flatMap(endpoint -> executeSkipCache(request, endpoint));
+            .flatMap(endpoint -> executeSkipCache(request, endpoint));
     }
 
     /**
@@ -119,19 +124,30 @@ public final class JerseyOEmbedClient implements OEmbedClient {
     @Override
     public Optional<OEmbedResponse> executeSkipCache(final OEmbedRequest request, final OEmbedEndpoint endpoint) {
         final Response response = client.target(request.toURI(endpoint))
-                .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE)
-                .request(MediaType.APPLICATION_JSON_TYPE, MediaType.TEXT_XML_TYPE)
-                .get();
+            .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE)
+            .request(MediaType.APPLICATION_JSON_TYPE, MediaType.TEXT_XML_TYPE)
+            .get();
+        return worker(response, 0);
+    }
 
+    private Optional<OEmbedResponse> worker(final Response response, final int numberOfRedirects) {
         switch (response.getStatusInfo().getFamily()) {
             case SUCCESSFUL:
-                final InputStream inputStream = response.readEntity(InputStream.class);
                 try {
-                    return responseParser.parse(inputStream, response.getHeaderString(HttpHeaders.CONTENT_TYPE));
-                } finally {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) { /*ignored*/ }
+                    try (final InputStream inputStream = response.readEntity(InputStream.class)) {
+                        return responseParser.parse(inputStream, response.getHeaderString(HttpHeaders.CONTENT_TYPE));
+                    }
+                } catch (final IOException e) {
+                    // ignore the error
+                    return Optional.empty();
+                }
+            case REDIRECTION:
+                if (numberOfRedirects == 0) {
+                    final Response redirect = client.target(response.getLocation())
+                        .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE)
+                        .request(MediaType.APPLICATION_JSON_TYPE, MediaType.TEXT_XML_TYPE)
+                        .get();
+                    return worker(redirect, numberOfRedirects + 1);
                 }
             default:
                 return Optional.empty();
