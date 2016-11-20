@@ -79,7 +79,7 @@ public class OEmbedEndpointTest {
                 .setURITemplate("https://www.example.com/oembed")
                 .build();
         assertThat(endpoint.getSchemePatterns().stream()
-                .map(schemePattern -> schemePattern.pattern())
+                .map(Pattern::pattern)
                 .collect(Collectors.toSet()), is(expectedSchemePattern));
     }
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import org.inferred.freebuilder.FreeBuilder;
 
@@ -29,6 +28,8 @@ public interface OEmbedResponse {
     @JsonProperty("type")
     OEmbedType getType();
 
+    // This is required by the oEmbed spec.
+    @SuppressWarnings("unused")
     @JsonProperty("version")
     default String getVersion() {
         // As per the oEmbed spec, version should always be 1.0
@@ -86,6 +87,8 @@ public interface OEmbedResponse {
 
     class Builder extends OEmbedResponse_Builder {
 
+        // Method exists to add {@link JsonAnySetter} annotation.
+        @SuppressWarnings("EmptyMethod")
         @Override
         @JsonAnySetter
         public Builder putCustomProperties(final String key, final Object value) {

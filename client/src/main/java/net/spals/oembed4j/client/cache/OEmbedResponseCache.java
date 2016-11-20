@@ -67,9 +67,9 @@ public class OEmbedResponseCache {
             // then add the response to the cache with the appropriate expiration
             // (which is in seconds according to the oEmbed spec)
             return response.filter(resp -> resp.getCacheAge().isPresent())
-                    .map(resp -> new ExpiringValue(response, resp.getCacheAge().get(), TimeUnit.SECONDS))
+                    .map(resp -> new ExpiringValue<>(response, resp.getCacheAge().get(), TimeUnit.SECONDS))
                     // Otherwise, return the response with an immediate expiration
-                    .orElseGet(() -> new ExpiringValue(response, 0L , TimeUnit.NANOSECONDS));
+                    .orElseGet(() -> new ExpiringValue<>(response, 0L, TimeUnit.NANOSECONDS));
         }
     }
 }

@@ -3,10 +3,8 @@ package net.spals.oembed4j.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.net.InternetDomainName;
 import org.inferred.freebuilder.FreeBuilder;
 
 import java.net.URI;
@@ -105,7 +103,6 @@ public interface OEmbedEndpoint {
 
             // Scheme patterns are 100% derived from the scheme templates.
             // We will completely ignore any scheme patterns set manually in the builder.
-            super.clearSchemePatterns();
             getSchemeTemplates().stream()
                     .map(schemeTemplate -> schemeTemplate.replaceAll("\\*", "(.*)"))
                     // Sigh. Some providers list only http:// schemes when
@@ -115,9 +112,9 @@ public interface OEmbedEndpoint {
                     // as well. Worst case is we send the request and it's rejected.
                     .flatMap(schemePatternStr ->
                             ImmutableSet.of(schemePatternStr, schemePatternStr.replaceFirst("http:", "https:")).stream())
-                    .map(schemePatterStr -> Pattern.compile(schemePatterStr))
+                    .map(Pattern::compile)
                     .collect(Collectors.toList())
-                    .forEach(schemePattern -> super.addSchemePatterns(schemePattern));
+                    .forEach(super::addSchemePatterns);
 
             // URI domain pattern is derived from the URI template
             checkNotNull(getURITemplate(), "A non-empty URI template is required for an oEmbed endpoint");
