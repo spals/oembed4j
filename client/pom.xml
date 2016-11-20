@@ -8,34 +8,29 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>spals-oembed4j-model</artifactId>
+    <artifactId>spals-oembed4j-client</artifactId>
     <version>1.0.0</version>
 
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-xml</artifactId>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
+            <groupId>net.jodah</groupId>
+            <artifactId>expiringmap</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
+            <groupId>net.spals.oembed4j</groupId>
+            <artifactId>spals-oembed4j-model</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-common</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.inferred</groupId>
-            <artifactId>freebuilder</artifactId>
+            <artifactId>jersey-client</artifactId>
         </dependency>
     </dependencies>
 </project>

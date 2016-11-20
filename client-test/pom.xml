@@ -8,7 +8,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>spals-oembed4j-model-test</artifactId>
+    <artifactId>spals-oembed4j-client-test</artifactId>
     <version>1.0.0</version>
 
     <dependencies>
@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>net.spals.oembed4j</groupId>
-            <artifactId>spals-oembed4j-model</artifactId>
+            <artifactId>spals-oembed4j-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<oembed>
+    <type>rich</type>
+    <height>1</height>
+    <html>&lt;script async src=&quot;https://www.example.com/myscript.js&quot;&gt;&lt;/script&gt;</html>
+    <width>2</width>
+</oembed>

@@ -7,7 +7,6 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>oEmbed4J</name>
     <description>
         A Java implementation of the oEmbed specification.
     </description>
@@ -42,10 +41,12 @@
 
         <!-- Dependency versions -->
         <catch-exception.version>1.4.4</catch-exception.version>
+        <expiringmap.version>0.5.7</expiringmap.version>
         <freebuilder.version>1.10.6</freebuilder.version>
         <guava.version>19.0</guava.version>
         <jackson.version>2.7.8</jackson.version>
         <javax.ws.version>2.0.1</javax.ws.version>
+        <jersey.version>2.23.1</jersey.version>
         <mockito.version>2.2.20</mockito.version>
         <spals.oembed4j.version>1.0.0</spals.oembed4j.version>
         <testng.version>6.9.10</testng.version>
@@ -57,6 +58,8 @@
     </properties>
 
     <modules>
+        <module>client</module>
+        <module>client-test</module>
         <module>model</module>
         <module>model-test</module>
     </modules>
@@ -79,6 +82,11 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jdk8</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
@@ -95,9 +103,29 @@
                 <version>${javax.ws.version}</version>
             </dependency>
             <dependency>
+                <groupId>net.jodah</groupId>
+                <artifactId>expiringmap</artifactId>
+                <version>${expiringmap.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.spals.oembed4j</groupId>
+                <artifactId>spals-oembed4j-client</artifactId>
+                <version>${spals.oembed4j.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>net.spals.oembed4j</groupId>
                 <artifactId>spals-oembed4j-model</artifactId>
                 <version>${spals.oembed4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-common</artifactId>
+                <version>${jersey.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -112,7 +140,7 @@
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
+                <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
