@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.google.common.base.Preconditions;
 import org.inferred.freebuilder.FreeBuilder;
 
 import java.net.URI;
@@ -28,13 +29,8 @@ public interface OEmbedResponse {
     @JsonProperty("type")
     OEmbedType getType();
 
-    // This is required by the oEmbed spec.
-    @SuppressWarnings("unused")
     @JsonProperty("version")
-    default String getVersion() {
-        // As per the oEmbed spec, version should always be 1.0
-        return "1.0";
-    }
+    String getVersion();
 
     // ========== Common optional fields ==========
     @JsonProperty("author_name")
@@ -87,12 +83,27 @@ public interface OEmbedResponse {
 
     class Builder extends OEmbedResponse_Builder {
 
+        /**
+         * As per the oEmbed spec, version should always be 1.0
+         */
+        private static final String DEFAULT_VERSION = "1.0";
+
+        public Builder() {
+            super.setVersion(DEFAULT_VERSION);
+        }
+
         // Method exists to add {@link JsonAnySetter} annotation.
         @SuppressWarnings("EmptyMethod")
         @Override
         @JsonAnySetter
         public Builder putCustomProperties(final String key, final Object value) {
             return super.putCustomProperties(key, value);
+        }
+
+        @Override
+        public Builder setVersion(String version) {
+            Preconditions.checkState(DEFAULT_VERSION.equals(version), "Per the oEmbed spec, versions should always be %s", DEFAULT_VERSION);
+            return super.setVersion(version);
         }
 
         @Override
@@ -111,7 +122,6 @@ public interface OEmbedResponse {
                     checkState(getWidth().isPresent(), "Width is required for %s content", getType());
                     break;
             }
-
             return super.build();
         }
     }

@@ -9,6 +9,8 @@ import net.spals.oembed4j.model.OEmbedEndpoint;
 import net.spals.oembed4j.model.OEmbedRequest;
 import net.spals.oembed4j.model.OEmbedResponse;
 import org.glassfish.jersey.client.ClientProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -20,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Optional;
@@ -40,38 +43,24 @@ public final class JerseyOEmbedClient implements OEmbedClient {
         }
 
         @Override
-        public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) {  }
+        public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) {
+        }
 
         @Override
-        public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) {  }
-    };
-
-    public static JerseyOEmbedClient create(final OEmbedRegistry registry) {
-        try {
-            // Configure the Jersey client
-            // Setup SSL management
-            // TODO: DO we need some real SSL management?
-            final SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null /*KeyManagers*/, new TrustManager[] {DEFAULT_TRUST_MANAGER}, new SecureRandom());
-
-            final ClientBuilder clientBuilder = ClientBuilder.newBuilder();
-            clientBuilder.sslContext(sslContext).hostnameVerifier((s, sslSession) -> true);
-            clientBuilder.property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE);
-
-            return new JerseyOEmbedClient(clientBuilder.build(), registry);
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
+        public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) {
         }
-    }
-
+    };
+    private static final Logger LOGGER = LoggerFactory.getLogger(JerseyOEmbedClient.class);
     private final Client client;
     private final OEmbedRegistry registry;
     private final OEmbedResponseCache responseCache;
     private final OEmbedResponseParser responseParser;
 
     @VisibleForTesting
-    JerseyOEmbedClient(final Client client,
-                       final OEmbedRegistry registry) {
+    JerseyOEmbedClient(
+        final Client client,
+        final OEmbedRegistry registry
+    ) {
         this.client = client;
         this.registry = registry;
         this.responseCache = OEmbedResponseCache.create(this);
@@ -79,14 +68,34 @@ public final class JerseyOEmbedClient implements OEmbedClient {
     }
 
     @VisibleForTesting
-    JerseyOEmbedClient(final Client client,
-                       final OEmbedRegistry registry,
-                       final OEmbedResponseCache responseCache,
-                       final OEmbedResponseParser responseParser) {
+    JerseyOEmbedClient(
+        final Client client,
+        final OEmbedRegistry registry,
+        final OEmbedResponseCache responseCache,
+        final OEmbedResponseParser responseParser
+    ) {
         this.client = client;
         this.registry = registry;
         this.responseCache = responseCache;
         this.responseParser = responseParser;
+    }
+
+    public static JerseyOEmbedClient create(final OEmbedRegistry registry) {
+        try {
+            // Configure the Jersey client
+            // Setup SSL management
+            // TODO: DO we need some real SSL management?
+            final SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null /*KeyManagers*/, new TrustManager[]{DEFAULT_TRUST_MANAGER}, new SecureRandom());
+
+            final ClientBuilder clientBuilder = ClientBuilder.newBuilder();
+            clientBuilder.sslContext(sslContext).hostnameVerifier((s, sslSession) -> true);
+            clientBuilder.property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE);
+
+            return new JerseyOEmbedClient(clientBuilder.build(), registry);
+        } catch (final Exception e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     /**
@@ -111,7 +120,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
     @Override
     public Optional<OEmbedResponse> executeSkipCache(final OEmbedRequest request) {
         return registry.getEndpoint(request.getResourceURI())
-                .flatMap(endpoint -> executeSkipCache(request, endpoint));
+            .flatMap(endpoint -> executeSkipCache(request, endpoint));
     }
 
     /**
@@ -119,22 +128,33 @@ public final class JerseyOEmbedClient implements OEmbedClient {
      */
     @Override
     public Optional<OEmbedResponse> executeSkipCache(final OEmbedRequest request, final OEmbedEndpoint endpoint) {
-        final Response response = client.target(request.toURI(endpoint))
-                .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE)
-                .request(MediaType.APPLICATION_JSON_TYPE, MediaType.TEXT_XML_TYPE)
-                .get();
+        return runTarget(request.toURI(endpoint), 0);
+    }
+
+    private Optional<OEmbedResponse> runTarget(final URI uri, final int numberOfRedirects) {
+        final Response response = client.target(uri)
+            .request(MediaType.APPLICATION_JSON_TYPE, MediaType.TEXT_XML_TYPE)
+            .get();
 
         switch (response.getStatusInfo().getFamily()) {
             case SUCCESSFUL:
-                final InputStream inputStream = response.readEntity(InputStream.class);
                 try {
-                    return responseParser.parse(inputStream, response.getHeaderString(HttpHeaders.CONTENT_TYPE));
-                } finally {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) { /*ignored*/ }
+                    try (final InputStream inputStream = response.readEntity(InputStream.class)) {
+                        return responseParser.parse(inputStream, response.getHeaderString(HttpHeaders.CONTENT_TYPE));
+                    }
+                } catch (final IOException e) {
+                    LOGGER.info("failed to read entity", e);
+                    // ignore the error
+                    return Optional.empty();
                 }
+            case REDIRECTION:
+                if (numberOfRedirects == 0) {
+                    return runTarget(response.getLocation(), numberOfRedirects + 1);
+                }
+                LOGGER.info("too many redirects: " + numberOfRedirects);
+                return Optional.empty();
             default:
+                LOGGER.info("unsuccessful response: " + response.getStatusInfo());
                 return Optional.empty();
         }
     }
