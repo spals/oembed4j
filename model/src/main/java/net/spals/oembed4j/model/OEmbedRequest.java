@@ -25,8 +25,9 @@ public interface OEmbedRequest {
 
     default URI toURI(final OEmbedEndpoint endpoint) {
         checkArgument(endpoint.matchesResourceURI(getResourceURI()),
-                "OEmbedEndpoint (%s) does not have a matching scheme for resource URI %s",
-                endpoint.getURITemplate(), getResourceURI());
+            "OEmbedEndpoint (%s) does not have a matching scheme for resource URI %s",
+            endpoint.getURITemplate(), getResourceURI()
+        );
 
         final UriBuilder uriBuilder = UriBuilder.fromUri(endpoint.getURITemplate());
         if (endpoint.getURITemplate().contains("format")) {
@@ -41,5 +42,11 @@ public interface OEmbedRequest {
         return uriBuilder.queryParam("url", getResourceURI()).build();
     }
 
-    class Builder extends OEmbedRequest_Builder {  }
+    class Builder extends OEmbedRequest_Builder {
+
+        public Builder setResourceURI(final String uri) {
+            setResourceURI(URI.create(uri));
+            return this;
+        }
+    }
 }
