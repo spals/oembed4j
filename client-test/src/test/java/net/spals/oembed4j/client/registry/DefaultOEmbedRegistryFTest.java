@@ -14,11 +14,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
- * Unit tests for {@link DefaultOEmbedRegistry}
+ * Functional tests for {@link DefaultOEmbedRegistry}
  *
  * @author tkral
  */
-public class DefaultOEmbedRegistryTest {
+public class DefaultOEmbedRegistryFTest {
 
     private OEmbedRegistry registry;
 
