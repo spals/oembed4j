@@ -177,6 +177,8 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <!-- Turn of incremental compilation to avoid: IllegalStateException: endPosTable already set -->
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
             </plugin>
         </plugins>
