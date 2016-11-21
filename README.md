@@ -6,7 +6,7 @@ A Java implementation of the [oEmbed specification](http://oembed.com).
 
 ### Installation
 
-oEmbed4j requires Java 8 and is available via Maven. You may also (build it from source)[#Building].
+oEmbed4j requires Java 8 and is available via Maven. You may also [build it from source](#building_from_source).
 
 ```xml
 <dependency>
@@ -122,7 +122,7 @@ final OEmbedEndpoint endpoint = registry.getProvider("YouTube").get().getEndpoin
 final Optional<OEmbedResponse> response = client.executeSkipCache(request, endpoint);
 ```
 
-## <a name="Building"></a> Building
+## <a name="building_from_source"></a> Building From Source
 
 Prerequisites:
 
