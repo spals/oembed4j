@@ -2,7 +2,8 @@ package net.spals.oembed4j.client;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import net.spals.oembed4j.client.cache.OEmbedResponseCache;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 import net.spals.oembed4j.client.parser.OEmbedResponseParser;
 import net.spals.oembed4j.client.registry.OEmbedRegistry;
 import net.spals.oembed4j.model.OEmbedEndpoint;
@@ -26,6 +27,7 @@ import java.net.URI;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An implementation of {@link OEmbedClient} based
@@ -34,7 +36,7 @@ import java.util.Optional;
  * @author tkral
  * @author spags
  */
-public final class JerseyOEmbedClient implements OEmbedClient {
+public class JerseyOEmbedClient implements OEmbedClient {
 
     private static final X509TrustManager DEFAULT_TRUST_MANAGER = new X509TrustManager() {
         @Override
@@ -53,25 +55,14 @@ public final class JerseyOEmbedClient implements OEmbedClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(JerseyOEmbedClient.class);
     private final Client client;
     private final OEmbedRegistry registry;
-    private final OEmbedResponseCache responseCache;
+    private final ExpiringMap<OEmbedRequest, OEmbedResponse> responseCache;
     private final OEmbedResponseParser responseParser;
 
     @VisibleForTesting
     JerseyOEmbedClient(
         final Client client,
-        final OEmbedRegistry registry
-    ) {
-        this.client = client;
-        this.registry = registry;
-        this.responseCache = OEmbedResponseCache.create(this);
-        this.responseParser = new OEmbedResponseParser();
-    }
-
-    @VisibleForTesting
-    JerseyOEmbedClient(
-        final Client client,
         final OEmbedRegistry registry,
-        final OEmbedResponseCache responseCache,
+        final ExpiringMap<OEmbedRequest, OEmbedResponse> responseCache,
         final OEmbedResponseParser responseParser
     ) {
         this.client = client;
@@ -82,7 +73,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
 
     public static JerseyOEmbedClient create(final OEmbedRegistry registry) {
         try {
-            // Configure the Jersey client
+            // 1. Configure the Jersey client
             // Setup SSL management
             // TODO: DO we need some real SSL management?
             final SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -92,7 +83,15 @@ public final class JerseyOEmbedClient implements OEmbedClient {
             clientBuilder.sslContext(sslContext).hostnameVerifier((s, sslSession) -> true);
             clientBuilder.property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE);
 
-            return new JerseyOEmbedClient(clientBuilder.build(), registry);
+            // 2. Build response cache
+            final ExpiringMap<OEmbedRequest, OEmbedResponse> responseCache = ExpiringMap.builder()
+                    .expirationPolicy(ExpirationPolicy.CREATED)
+                    .variableExpiration()
+                    .build();
+            // 3. Build response parser
+            final OEmbedResponseParser responseParser = new OEmbedResponseParser();
+
+            return new JerseyOEmbedClient(clientBuilder.build(), registry, responseCache, responseParser);
         } catch (final Exception e) {
             throw Throwables.propagate(e);
         }
@@ -111,7 +110,17 @@ public final class JerseyOEmbedClient implements OEmbedClient {
      */
     @Override
     public Optional<OEmbedResponse> execute(final OEmbedRequest request) {
-        return responseCache.get(request.getResourceURI());
+        final Optional<OEmbedResponse> cachedResponse = Optional.ofNullable(responseCache.get(request));
+        // If we got a cache hit, return immediately
+        if (cachedResponse.isPresent()) {
+            return cachedResponse;
+        }
+
+        // Otherwise, run the request and see if we can cache it
+        final Optional<OEmbedResponse> response = executeSkipCache(request);
+        response.filter(resp -> resp.getCacheAge().isPresent())
+                .ifPresent(resp -> responseCache.put(request, resp, resp.getCacheAge().get(), TimeUnit.SECONDS));
+        return response;
     }
 
     /**
@@ -120,7 +129,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
     @Override
     public Optional<OEmbedResponse> executeSkipCache(final OEmbedRequest request) {
         return registry.getEndpoint(request.getResourceURI())
-            .flatMap(endpoint -> executeSkipCache(request, endpoint));
+                .flatMap(endpoint -> executeSkipCache(request, endpoint));
     }
 
     /**
@@ -129,6 +138,11 @@ public final class JerseyOEmbedClient implements OEmbedClient {
     @Override
     public Optional<OEmbedResponse> executeSkipCache(final OEmbedRequest request, final OEmbedEndpoint endpoint) {
         return runTarget(request.toURI(endpoint), 0);
+    }
+
+    @VisibleForTesting
+    ExpiringMap<OEmbedRequest, OEmbedResponse> getResponseCache() {
+        return responseCache;
     }
 
     private Optional<OEmbedResponse> runTarget(final URI uri, final int numberOfRedirects) {
