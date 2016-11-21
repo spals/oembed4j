@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import net.spals.oembed4j.model.OEmbedFormat;
 import net.spals.oembed4j.model.OEmbedRequest;
 import net.spals.oembed4j.model.OEmbedResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -22,19 +24,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class OEmbedResponseParser {
 
     private static final ObjectMapper jsonMapper = new ObjectMapper()
-            .registerModule(new Jdk8Module());
+        .registerModule(new Jdk8Module());
     private static final ObjectMapper xmlMapper = new XmlMapper()
-            .registerModule(new Jdk8Module());
+        .registerModule(new Jdk8Module());
+    private static final Logger LOGGER = LoggerFactory.getLogger(OEmbedResponse.class);
 
     /**
      * Parse the given response {@link InputStream} which is paired with
      * the given response media type.
      *
      * @param inputStream The {@link InputStream} from the client response.
-     * @param mediaType The media type of the client response.
+     * @param mediaType   The media type of the client response.
      * @return The parsed {@link InputStream} as an {@link OEmbedResponse}, if possible.
-     *         Otherwise, {@code Optional.empty()} for an unrecognized media type or for
-     *         any parsing error.
+     * Otherwise, {@code Optional.empty()} for an unrecognized media type or for
+     * any parsing error.
      */
     public Optional<OEmbedResponse> parse(final InputStream inputStream, final String mediaType) {
         checkNotNull(inputStream);
@@ -54,9 +57,9 @@ public class OEmbedResponseParser {
      * Parse the given response {@link InputStream} for the given {@link OEmbedFormat}.
      *
      * @param inputStream The {@link InputStream} from the client response.
-     * @param format The {@link OEmbedFormat} used in the {@link OEmbedRequest}
+     * @param format      The {@link OEmbedFormat} used in the {@link OEmbedRequest}
      * @return The parsed {@link InputStream} as an {@link OEmbedResponse}, if possible.
-     *         Otherwise, {@code Optional.empty()} for any parsing error.
+     * Otherwise, {@code Optional.empty()} for any parsing error.
      */
     public Optional<OEmbedResponse> parse(final InputStream inputStream, final OEmbedFormat format) {
         checkNotNull(inputStream);
@@ -70,7 +73,8 @@ public class OEmbedResponseParser {
                 default:
                     return Optional.of(jsonMapper.readValue(inputStream, OEmbedResponse.class));
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
+            LOGGER.info("failed to parse input stream", e);
             return Optional.empty();
         }
     }

@@ -9,6 +9,8 @@ import net.spals.oembed4j.model.OEmbedEndpoint;
 import net.spals.oembed4j.model.OEmbedRequest;
 import net.spals.oembed4j.model.OEmbedResponse;
 import org.glassfish.jersey.client.ClientProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -47,6 +49,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
         public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) {
         }
     };
+    private static final Logger LOGGER = LoggerFactory.getLogger(JerseyOEmbedClient.class);
     private final Client client;
     private final OEmbedRegistry registry;
     private final OEmbedResponseCache responseCache;
@@ -89,7 +92,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
             clientBuilder.property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE);
 
             return new JerseyOEmbedClient(clientBuilder.build(), registry);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw Throwables.propagate(e);
         }
     }
@@ -139,6 +142,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
                         return responseParser.parse(inputStream, response.getHeaderString(HttpHeaders.CONTENT_TYPE));
                     }
                 } catch (final IOException e) {
+                    LOGGER.info("failed to read entity", e);
                     // ignore the error
                     return Optional.empty();
                 }
@@ -146,7 +150,10 @@ public final class JerseyOEmbedClient implements OEmbedClient {
                 if (numberOfRedirects == 0) {
                     return runTarget(response.getLocation(), numberOfRedirects + 1);
                 }
+                LOGGER.info("too many redirects: " + numberOfRedirects);
+                return Optional.empty();
             default:
+                LOGGER.info("unsuccessful response: " + response.getStatusInfo());
                 return Optional.empty();
         }
     }
