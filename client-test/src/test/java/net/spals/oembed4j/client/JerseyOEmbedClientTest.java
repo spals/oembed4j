@@ -40,16 +40,15 @@ public class JerseyOEmbedClientTest {
 
     @DataProvider
     Object[][] executeProvider() {
-//        final URI vimeoURI = URI.create("https://vimeo.com/189789787");
-//        final URI youTubeURI = {URI.create("https://www.youtube.com/watch?v=qtNI1WbOp5Q");
-
         // Spot check common oEmbed providers
         return new Object[][] {
                 flickr(),
+                vimeo(),
+                youTube(),
         };
     }
 
-    @Test(enabled = false, dataProvider = "executeProvider")
+    @Test(dataProvider = "executeProvider")
     public void testExecute(final URI resourceURI,
                             final OEmbedResponse expectedResponse) {
         final OEmbedRequest request = new OEmbedRequest.Builder().setResourceURI(resourceURI).build();
@@ -92,6 +91,55 @@ public class JerseyOEmbedClientTest {
                 .putCustomProperties("license_url", "https://creativecommons.org/licenses/by-sa/2.0/")
                 .putCustomProperties("web_page", "https://www.flickr.com/photos/lilithis/2207159142/")
                 .putCustomProperties("web_page_short_url", "https://flic.kr/p/4n3gvY")
+                .build();
+
+        return new Object[]{uri, expectedResponse};
+    }
+
+    private Object[] vimeo() {
+        final URI uri = URI.create("https://vimeo.com/189789787");
+
+        final OEmbedResponse expectedResponse = new OEmbedResponse.Builder()
+                .setAuthorName("Uncorked Productions")
+                .setAuthorURI(URI.create("https://vimeo.com/uncorkedprods"))
+                .setHeight(338)
+                .setHtml("<iframe src=\"https://player.vimeo.com/video/189789787\" width=\"640\" height=\"338\" frameborder=\"0\" title=\"Maxine the Fluffy Corgi\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>")
+                .setProviderName("Vimeo")
+                .setProviderURI(URI.create("https://vimeo.com/"))
+                .setThumbnailHeight(337)
+                .setThumbnailURI(URI.create("https://i.vimeocdn.com/video/600355807_640.jpg"))
+                .setThumbnailWidth(640)
+                .setTitle("Maxine the Fluffy Corgi")
+                .setType(OEmbedType.video)
+                .setWidth(640)
+                .putCustomProperties("description", "Short legs. Big city.\n\nhttps://www.instagram.com/madmax_fluffyroad/\n\nmade by: bryan reisberg (& Maxine's owner)\ncamera: owen levelle\nvoice: jon st. john")
+                .putCustomProperties("duration", 34)
+                .putCustomProperties("is_plus", "0")
+                .putCustomProperties("thumbnail_url_with_play_button", "https://i.vimeocdn.com/filter/overlay?src0=https%3A%2F%2Fi.vimeocdn.com%2Fvideo%2F600355807_640.jpg&src1=http%3A%2F%2Ff.vimeocdn.com%2Fp%2Fimages%2Fcrawler_play.png")
+                .putCustomProperties("upload_date", "2016-11-01 10:40:37")
+                .putCustomProperties("uri", "/videos/189789787")
+                .putCustomProperties("video_id", 189789787)
+                .build();
+
+        return new Object[]{uri, expectedResponse};
+    }
+
+    private Object[] youTube() {
+        final URI uri = URI.create("https://www.youtube.com/watch?v=qtNI1WbOp5Q");
+
+        final OEmbedResponse expectedResponse = new OEmbedResponse.Builder()
+                .setAuthorName("Real Grumpy Cat")
+                .setAuthorURI(URI.create("https://www.youtube.com/user/SevereAvoidance"))
+                .setHeight(270)
+                .setHtml("<iframe width=\"480\" height=\"270\" src=\"https://www.youtube.com/embed/qtNI1WbOp5Q?feature=oembed\" frameborder=\"0\" allowfullscreen></iframe>")
+                .setProviderName("YouTube")
+                .setProviderURI(URI.create("https://www.youtube.com/"))
+                .setThumbnailHeight(360)
+                .setThumbnailURI(URI.create("https://i.ytimg.com/vi/qtNI1WbOp5Q/hqdefault.jpg"))
+                .setThumbnailWidth(480)
+                .setTitle("Grumpy Cat's Worst #IceBucketChallenge Ever!")
+                .setType(OEmbedType.video)
+                .setWidth(480)
                 .build();
 
         return new Object[]{uri, expectedResponse};
