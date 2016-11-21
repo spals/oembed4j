@@ -20,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Optional;
@@ -123,14 +124,14 @@ public final class JerseyOEmbedClient implements OEmbedClient {
      */
     @Override
     public Optional<OEmbedResponse> executeSkipCache(final OEmbedRequest request, final OEmbedEndpoint endpoint) {
-        final Response response = client.target(request.toURI(endpoint))
-            .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE)
-            .request(MediaType.APPLICATION_JSON_TYPE, MediaType.TEXT_XML_TYPE)
-            .get();
-        return worker(response, 0);
+        return runTarget(request.toURI(endpoint), 0);
     }
 
-    private Optional<OEmbedResponse> worker(final Response response, final int numberOfRedirects) {
+    private Optional<OEmbedResponse> runTarget(final URI uri, final int numberOfRedirects) {
+        final Response response = client.target(uri)
+            .request(MediaType.APPLICATION_JSON_TYPE, MediaType.TEXT_XML_TYPE)
+            .get();
+
         switch (response.getStatusInfo().getFamily()) {
             case SUCCESSFUL:
                 try {
@@ -143,11 +144,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
                 }
             case REDIRECTION:
                 if (numberOfRedirects == 0) {
-                    final Response redirect = client.target(response.getLocation())
-                        .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE)
-                        .request(MediaType.APPLICATION_JSON_TYPE, MediaType.TEXT_XML_TYPE)
-                        .get();
-                    return worker(redirect, numberOfRedirects + 1);
+                    return runTarget(response.getLocation(), numberOfRedirects + 1);
                 }
             default:
                 return Optional.empty();

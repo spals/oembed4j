@@ -88,6 +88,10 @@ public interface OEmbedResponse {
          */
         private static final String DEFAULT_VERSION = "1.0";
 
+        public Builder() {
+            super.setVersion(DEFAULT_VERSION);
+        }
+
         // Method exists to add {@link JsonAnySetter} annotation.
         @SuppressWarnings("EmptyMethod")
         @Override
@@ -104,7 +108,6 @@ public interface OEmbedResponse {
 
         @Override
         public OEmbedResponse build() {
-            super.setVersion(DEFAULT_VERSION);
             // Check required fields by type
             switch(getType()) {
                 case photo:
