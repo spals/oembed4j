@@ -24,6 +24,8 @@ import java.net.URI;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An implementation of {@link OEmbedClient} based
@@ -47,6 +49,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
         public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) {
         }
     };
+    private static final Logger LOGGER = Logger.getLogger(JerseyOEmbedClient.class.getName());
     private final Client client;
     private final OEmbedRegistry registry;
     private final OEmbedResponseCache responseCache;
@@ -89,7 +92,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
             clientBuilder.property(ClientProperties.FOLLOW_REDIRECTS, Boolean.TRUE);
 
             return new JerseyOEmbedClient(clientBuilder.build(), registry);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw Throwables.propagate(e);
         }
     }
@@ -139,6 +142,7 @@ public final class JerseyOEmbedClient implements OEmbedClient {
                         return responseParser.parse(inputStream, response.getHeaderString(HttpHeaders.CONTENT_TYPE));
                     }
                 } catch (final IOException e) {
+                    LOGGER.log(Level.INFO, "failed to read entity", e);
                     // ignore the error
                     return Optional.empty();
                 }
@@ -146,7 +150,10 @@ public final class JerseyOEmbedClient implements OEmbedClient {
                 if (numberOfRedirects == 0) {
                     return runTarget(response.getLocation(), numberOfRedirects + 1);
                 }
+                LOGGER.log(Level.INFO, "too many redirects: " + numberOfRedirects);
+                return Optional.empty();
             default:
+                LOGGER.log(Level.INFO, "unsuccessful response: " + response.getStatusInfo());
                 return Optional.empty();
         }
     }

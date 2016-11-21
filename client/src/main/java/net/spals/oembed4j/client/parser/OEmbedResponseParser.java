@@ -11,6 +11,8 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -25,6 +27,7 @@ public class OEmbedResponseParser {
             .registerModule(new Jdk8Module());
     private static final ObjectMapper xmlMapper = new XmlMapper()
             .registerModule(new Jdk8Module());
+    private static final Logger LOGGER = Logger.getLogger(OEmbedResponse.class.getName());
 
     /**
      * Parse the given response {@link InputStream} which is paired with
@@ -70,7 +73,8 @@ public class OEmbedResponseParser {
                 default:
                     return Optional.of(jsonMapper.readValue(inputStream, OEmbedResponse.class));
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
+            LOGGER.log(Level.INFO, "failed to parse input stream", e);
             return Optional.empty();
         }
     }
