@@ -43,8 +43,11 @@ public class OEmbedResponseCache {
      * If the cache does not contain it, then it will attempt
      * an automatic load.
      *
-     * @param resourceURI
-     * @return
+     * @param resourceURI The resource {@link URI} which is to be
+     *                    checked for in the cache.
+     * @return The {@link OEmbedResponse} associated with the given resource URI, if possible.
+     *         If an associated response is not available in the cache, it will be automatically
+     *         loaded.
      */
     public Optional<OEmbedResponse> get(final URI resourceURI) {
         return cacheDelegate.get(resourceURI);

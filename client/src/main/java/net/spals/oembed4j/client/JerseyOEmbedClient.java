@@ -32,6 +32,7 @@ import java.util.Optional;
  * on a Jersey client.
  *
  * @author tkral
+ * @author spags
  */
 public final class JerseyOEmbedClient implements OEmbedClient {
 
