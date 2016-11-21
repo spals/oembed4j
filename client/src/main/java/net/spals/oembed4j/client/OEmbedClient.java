@@ -37,11 +37,28 @@ public interface OEmbedClient extends AutoCloseable {
      */
     Optional<OEmbedResponse> execute(OEmbedRequest request);
 
+    /**
+     * Finds a matching {@link OEmbedEndpoint} for the given
+     * {@link OEmbedRequest} and executes the request against it.
+     *
+     * This method will *never* check the {@link OEmbedResponseCache}
+     * for a result before executing the request.
+     *
+     * @param request A {@link OEmbedRequest} which represents
+     *                the resource for which we wish to get oEmbed
+     *                information
+     * @return An {@link OEmbedResponse}, if possible.
+     *         Otherwise, {@code Optional.empty()}, if the request cannot
+     *         be successfully executed.
+     */
     Optional<OEmbedResponse> executeSkipCache(OEmbedRequest request);
 
     /**
      * Executes the given {@link OEmbedRequest} against the given
      * {@link OEmbedEndpoint}.
+     *
+     * This method will *never* check the {@link OEmbedResponseCache}
+     * for a result before executing the request.
      *
      * @param request A {@link OEmbedRequest} which represents
      *                the resource for which we wish to get oEmbed
