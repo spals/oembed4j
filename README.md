@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/spals/oembed4j.svg?branch=master)](https://travis-ci.org/spals/oembed4j)
+
 # oEmbed4j
 
 A Java implementation of the [oEmbed specification](http://oembed.com).
