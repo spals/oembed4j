@@ -1,6 +1,5 @@
 package net.spals.oembed4j.client;
 
-import net.spals.oembed4j.client.cache.OEmbedResponseCache;
 import net.spals.oembed4j.model.OEmbedEndpoint;
 import net.spals.oembed4j.model.OEmbedRequest;
 import net.spals.oembed4j.model.OEmbedResponse;
@@ -25,8 +24,8 @@ public interface OEmbedClient extends AutoCloseable {
      * Finds a matching {@link OEmbedEndpoint} for the given
      * {@link OEmbedRequest} and executes the request against it.
      *
-     * This method will check the {@link OEmbedResponseCache}
-     * for a result before executing the request.
+     * This method will check a response cache for a result
+     * before executing the request.
      *
      * @param request A {@link OEmbedRequest} which represents
      *                the resource for which we wish to get oEmbed
@@ -41,8 +40,8 @@ public interface OEmbedClient extends AutoCloseable {
      * Finds a matching {@link OEmbedEndpoint} for the given
      * {@link OEmbedRequest} and executes the request against it.
      *
-     * This method will *never* check the {@link OEmbedResponseCache}
-     * for a result before executing the request.
+     * This method will *never* check a response cache for a result
+     * before executing the request.
      *
      * @param request A {@link OEmbedRequest} which represents
      *                the resource for which we wish to get oEmbed
@@ -57,8 +56,8 @@ public interface OEmbedClient extends AutoCloseable {
      * Executes the given {@link OEmbedRequest} against the given
      * {@link OEmbedEndpoint}.
      *
-     * This method will *never* check the {@link OEmbedResponseCache}
-     * for a result before executing the request.
+     * This method will *never* check a response cache for a result
+     * before executing the request.
      *
      * @param request A {@link OEmbedRequest} which represents
      *                the resource for which we wish to get oEmbed

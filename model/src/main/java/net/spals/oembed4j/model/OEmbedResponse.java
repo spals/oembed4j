@@ -86,7 +86,7 @@ public interface OEmbedResponse {
         /**
          * As per the oEmbed spec, version should always be 1.0
          */
-        private static final String DEFAULT_VERSION = "1.0";
+        public static final String DEFAULT_VERSION = "1.0";
 
         public Builder() {
             super.setVersion(DEFAULT_VERSION);
