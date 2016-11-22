@@ -25,6 +25,11 @@ import static com.google.common.base.Preconditions.checkState;
 @JacksonXmlRootElement(localName = "oembed")
 public interface OEmbedResponse {
 
+    /**
+     * As per the oEmbed spec, version should always be 1.0
+     */
+    String DEFAULT_VERSION = "1.0";
+
     // ========== Common required fields ==========
     @JsonProperty("type")
     OEmbedType getType();
@@ -82,11 +87,6 @@ public interface OEmbedResponse {
     }
 
     class Builder extends OEmbedResponse_Builder {
-
-        /**
-         * As per the oEmbed spec, version should always be 1.0
-         */
-        private static final String DEFAULT_VERSION = "1.0";
 
         public Builder() {
             super.setVersion(DEFAULT_VERSION);
