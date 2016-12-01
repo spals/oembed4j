@@ -32,5 +32,9 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
+        <dependency>
+            <groupId>net.spals.midas</groupId>
+            <artifactId>midas</artifactId>
+        </dependency>
     </dependencies>
 </project>

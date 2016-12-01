@@ -51,6 +51,7 @@
         <spals.oembed4j.version>1.0.0</spals.oembed4j.version>
         <testng.version>6.9.10</testng.version>
         <hamcrest.version>2.0.0.0</hamcrest.version>
+        <midas.version>1.0.1</midas.version>
 
         <!-- Plugin versions -->
         <maven-compiler-plugin.version>3.2</maven-compiler-plugin.version>
@@ -134,6 +135,11 @@
                 <artifactId>java-hamcrest</artifactId>
                 <version>${hamcrest.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.spals.midas</groupId>
+                <artifactId>midas</artifactId>
+                <version>${midas.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.inferred</groupId>
