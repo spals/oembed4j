@@ -1,7 +1,6 @@
 package net.spals.oembed4j.client;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import net.spals.oembed4j.client.parser.OEmbedResponseParser;
@@ -93,7 +92,7 @@ public class JerseyOEmbedClient implements OEmbedClient {
 
             return new JerseyOEmbedClient(clientBuilder.build(), registry, responseCache, responseParser);
         } catch (final Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

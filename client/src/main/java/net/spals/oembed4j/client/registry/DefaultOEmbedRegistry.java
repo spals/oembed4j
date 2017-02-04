@@ -3,7 +3,6 @@ package net.spals.oembed4j.client.registry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
 import com.google.common.net.InternetDomainName;
 import net.spals.oembed4j.model.OEmbedEndpoint;
 import net.spals.oembed4j.model.OEmbedProvider;
@@ -48,7 +47,7 @@ public final class DefaultOEmbedRegistry implements OEmbedRegistry {
                     new TypeReference<List<OEmbedProvider>>() {});
             return new DefaultOEmbedRegistry(providerList);
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -58,7 +57,7 @@ public final class DefaultOEmbedRegistry implements OEmbedRegistry {
                     new TypeReference<List<OEmbedProvider>>() {});
             return new DefaultOEmbedRegistry(providerList);
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

@@ -60,8 +60,7 @@ public interface OEmbedEndpoint {
         }
 
         return getSchemePatterns().stream()
-                .filter(pattern -> pattern.matcher(resourceURI.toString()).matches())
-                .findAny().isPresent();
+            .anyMatch(pattern -> pattern.matcher(resourceURI.toString()).matches());
     }
 
     class Builder extends OEmbedEndpoint_Builder {
@@ -104,17 +103,17 @@ public interface OEmbedEndpoint {
             // Scheme patterns are 100% derived from the scheme templates.
             // We will completely ignore any scheme patterns set manually in the builder.
             getSchemeTemplates().stream()
-                    .map(schemeTemplate -> schemeTemplate.replaceAll("\\*", "(.*)"))
-                    // Sigh. Some providers list only http:// schemes when
-                    // their endpoints will also accept https:// so a straight
-                    // scheme match will miss these cases. So we'll err on the
-                    // permissive side, by checking for https:// in those cases
-                    // as well. Worst case is we send the request and it's rejected.
-                    .flatMap(schemePatternStr ->
-                            ImmutableSet.of(schemePatternStr, schemePatternStr.replaceFirst("http:", "https:")).stream())
-                    .map(Pattern::compile)
-                    .collect(Collectors.toList())
-                    .forEach(super::addSchemePatterns);
+                .map(schemeTemplate -> schemeTemplate.replaceAll("\\*", "(.*)"))
+                // Sigh. Some providers list only http:// schemes when
+                // their endpoints will also accept https:// so a straight
+                // scheme match will miss these cases. So we'll err on the
+                // permissive side, by checking for https:// in those cases
+                // as well. Worst case is we send the request and it's rejected.
+                .flatMap(schemePatternStr ->
+                    ImmutableSet.of(schemePatternStr, schemePatternStr.replaceFirst("http:", "https:")).stream())
+                .map(Pattern::compile)
+                .collect(Collectors.toList())
+                .forEach(super::addSchemePatterns);
 
             // URI domain pattern is derived from the URI template
             checkNotNull(getURITemplate(), "A non-empty URI template is required for an oEmbed endpoint");

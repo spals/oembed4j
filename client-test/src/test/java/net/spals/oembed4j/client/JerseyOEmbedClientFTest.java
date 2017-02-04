@@ -2,7 +2,6 @@ package net.spals.oembed4j.client;
 
 import net.spals.midas.GoldFile;
 import net.spals.midas.io.GoldPaths;
-import net.spals.midas.serializer.Serializers;
 import net.spals.oembed4j.client.registry.DefaultOEmbedRegistry;
 import net.spals.oembed4j.client.registry.OEmbedRegistry;
 import net.spals.oembed4j.model.OEmbedRequest;
@@ -23,7 +22,7 @@ import static org.hamcrest.Matchers.not;
 /**
  * Functional tests for {@link JerseyOEmbedClient}
  *
- * @author tkral
+ * @author tkral, spags
  */
 public class JerseyOEmbedClientFTest {
 
@@ -58,8 +57,6 @@ public class JerseyOEmbedClientFTest {
 
         GoldFile.builder()
             .withPath(GoldPaths.simpleClass(GoldPaths.MAVEN, JerseyOEmbedClientFTest.class))
-            .withReflectionSerializer()
-            .withSerializer(Serializers.of())
             .build()
             .run(response.get(), Paths.get(resourceURI.getHost()));
     }
