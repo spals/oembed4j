@@ -21,22 +21,22 @@ public class OEmbedProviderTest {
 
     @DataProvider
     Object[][] domainDerivedProvider() {
-        return new Object[][] {
-                {URI.create("https://vimeo.com/"), "vimeo.com"},
-                {URI.create("http://www.youtube.com/"), "www.youtube.com"},
+        return new Object[][]{
+            {URI.create("https://vimeo.com/"), "vimeo.com"},
+            {URI.create("http://www.youtube.com/"), "www.youtube.com"},
         };
     }
 
     @Test(dataProvider = "domainDerivedProvider")
     public void testDomainDerived(final URI uri, final String expectedDomainName) {
         final OEmbedProvider provider = new OEmbedProvider.Builder()
-                .setName("MyProvider").setURI(uri).build();
+            .setName("MyProvider").setURI(uri).build();
         assertThat(provider.getDomain().toString(), is(expectedDomainName));
     }
 
     @Test
     public void testDomainManual() {
-        catchException(new OEmbedProvider.Builder()).setDomain(InternetDomainName.from("www.example.com"));
+        catchException(() -> new OEmbedProvider.Builder().setDomain(InternetDomainName.from("www.example.com")));
         assertThat(caughtException(), instanceOf(UnsupportedOperationException.class));
     }
 }

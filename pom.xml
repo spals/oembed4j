@@ -1,6 +1,12 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+    <parent>
+        <groupId>net.spals</groupId>
+        <artifactId>spals-parent-pom</artifactId>
+        <version>5</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.spals.oembed4j</groupId>
     <artifactId>spals-oembed4j-parent</artifactId>
@@ -36,26 +42,14 @@
     </licenses>
 
     <properties>
-        <!-- Java version -->
-        <java.version>1.8</java.version>
-
         <!-- Dependency versions -->
-        <catch-exception.version>1.4.4</catch-exception.version>
         <expiringmap.version>0.5.7</expiringmap.version>
-        <freebuilder.version>1.10.6</freebuilder.version>
-        <guava.version>19.0</guava.version>
-        <jackson.version>2.7.8</jackson.version>
         <javax.ws.version>2.0.1</javax.ws.version>
         <jersey.version>2.23.1</jersey.version>
-        <mockito.version>2.2.20</mockito.version>
         <spals.oembed4j.version>1.0.0</spals.oembed4j.version>
-        <testng.version>6.9.10</testng.version>
-        <hamcrest.version>2.0.0.0</hamcrest.version>
+        <midas.version>2.0.0</midas.version>
 
         <!-- Plugin versions -->
-        <maven-compiler-plugin.version>3.2</maven-compiler-plugin.version>
-        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
         <slf4j-api.version>1.7.21</slf4j-api.version>
     </properties>
 
@@ -74,11 +68,6 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
                 <version>${jackson.version}</version>
@@ -87,17 +76,6 @@
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jdk8</artifactId>
                 <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>eu.codearte.catch-exception</groupId>
-                <artifactId>catch-exception</artifactId>
-                <version>${catch-exception.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>javax.ws.rs</groupId>
@@ -130,10 +108,9 @@
                 <version>${jersey.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>java-hamcrest</artifactId>
-                <version>${hamcrest.version}</version>
-                <scope>test</scope>
+                <groupId>net.spals.midas</groupId>
+                <artifactId>midas</artifactId>
+                <version>${midas.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.inferred</groupId>
@@ -144,18 +121,6 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>${testng.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

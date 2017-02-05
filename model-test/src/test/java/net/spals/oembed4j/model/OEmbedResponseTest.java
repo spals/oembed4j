@@ -20,33 +20,44 @@ public class OEmbedResponseTest {
 
     @DataProvider
     Object[][] requiredFieldsByTypeProvider() {
-        return new Object[][] {
-                // Case: No fields are required by the link type
-                {new OEmbedResponse.Builder(), OEmbedType.link},
-                {new OEmbedResponse.Builder().setUrl("http://www.example.com/myimage").setHeight(1).setWidth(2),
-                    OEmbedType.photo},
-                {new OEmbedResponse.Builder().setHtml("<html></html>").setHeight(1).setWidth(2),
-                        OEmbedType.rich},
-                {new OEmbedResponse.Builder().setHtml("<iframe src=\"http://www.example.com/myvideo\"></iframe>").setHeight(1).setWidth(2),
-                        OEmbedType.video},
+        return new Object[][]{
+            // Case: No fields are required by the link type
+            {new OEmbedResponse.Builder(), OEmbedType.link},
+            {
+                new OEmbedResponse.Builder().setUrl("http://www.example.com/myimage").setHeight(1).setWidth(2),
+                OEmbedType.photo
+            },
+            {
+                new OEmbedResponse.Builder().setHtml("<html></html>").setHeight(1).setWidth(2),
+                OEmbedType.rich
+            },
+            {
+                new OEmbedResponse.Builder()
+                    .setHtml("<iframe src=\"http://www.example.com/myvideo\"></iframe>")
+                    .setHeight(1)
+                    .setWidth(2),
+                OEmbedType.video
+            },
         };
     }
 
     @Test(dataProvider = "requiredFieldsByTypeProvider")
-    public void testRequiredFieldsByType(final OEmbedResponse.Builder responseBuilder,
-                                         final OEmbedType type) {
+    public void testRequiredFieldsByType(
+        final OEmbedResponse.Builder responseBuilder,
+        final OEmbedType type
+    ) {
         assertThat(responseBuilder.setType(type).build(), notNullValue());
     }
 
     @DataProvider
     Object[][] missingRequiredFieldsByTypeProvider() {
         return EnumSet.complementOf(EnumSet.of(OEmbedType.link))
-                .stream().map(type -> new Object[]{type}).toArray(Object[][]::new);
+            .stream().map(type -> new Object[]{type}).toArray(Object[][]::new);
     }
 
     @Test(dataProvider = "missingRequiredFieldsByTypeProvider")
     public void testMissingRequiredFieldsByType(final OEmbedType type) {
-        catchException(new OEmbedResponse.Builder().setType(type)).build();
+        catchException(() -> new OEmbedResponse.Builder().setType(type).build());
         assertThat(caughtException(), instanceOf(IllegalStateException.class));
     }
 }
