@@ -23,11 +23,11 @@ public class JerseyOEmbedClientTest {
 
     @DataProvider
     Object[][] executeWithoutCachingProvider() {
-        return new Object[][] {
-                // Case: Empty response
-                {Optional.empty()},
-                // Case: Response without cache age
-                {Optional.of(new OEmbedResponse.Builder().setType(OEmbedType.link).build())},
+        return new Object[][]{
+            // Case: Empty response
+            {Optional.empty()},
+            // Case: Response without cache age
+            {Optional.of(new OEmbedResponse.Builder().setType(OEmbedType.link).build())},
         };
     }
 
@@ -38,7 +38,7 @@ public class JerseyOEmbedClientTest {
         doReturn(response).when(client).executeSkipCache(any(OEmbedRequest.class));
 
         final OEmbedRequest request = new OEmbedRequest.Builder()
-                .setResourceURI("http://www.example.com/myresource").build();
+            .setResourceURI("http://www.example.com/myresource").build();
 
         assertThat(client.execute(request), is(response));
         // Verify that we don't cache the result
@@ -48,16 +48,16 @@ public class JerseyOEmbedClientTest {
     @Test
     public void testExecuteWithCaching() {
         final Optional<OEmbedResponse> response = Optional.of(new OEmbedResponse.Builder()
-                .setType(OEmbedType.link)
-                .setCacheAge(2)
-                .build());
+            .setType(OEmbedType.link)
+            .setCacheAge(2)
+            .build());
 
         final OEmbedRegistry registry = mock(OEmbedRegistry.class);
         final JerseyOEmbedClient client = spy(JerseyOEmbedClient.create(registry));
         doReturn(response).when(client).executeSkipCache(any(OEmbedRequest.class));
 
         final OEmbedRequest request = new OEmbedRequest.Builder()
-                .setResourceURI("http://www.example.com/myresource").build();
+            .setResourceURI("http://www.example.com/myresource").build();
 
         assertThat(client.execute(request), is(response));
         // Verify that we don't cache the result
