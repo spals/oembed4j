@@ -110,6 +110,7 @@
                 <groupId>net.spals.midas</groupId>
                 <artifactId>midas</artifactId>
                 <version>${midas.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.inferred</groupId>
