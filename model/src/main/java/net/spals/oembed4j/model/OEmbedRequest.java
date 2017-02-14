@@ -25,8 +25,8 @@ public interface OEmbedRequest {
 
     default URI toURI(final OEmbedEndpoint endpoint) {
         checkArgument(endpoint.matchesResourceURI(getResourceURI()),
-            "OEmbedEndpoint (%s) does not have a matching scheme for resource URI %s",
-            endpoint.getURITemplate(), getResourceURI()
+            String.format("OEmbedEndpoint (%s) does not have a matching scheme for resource URI %s",
+                endpoint.getURITemplate(), getResourceURI())
         );
 
         final UriBuilder uriBuilder = UriBuilder.fromUri(endpoint.getURITemplate());

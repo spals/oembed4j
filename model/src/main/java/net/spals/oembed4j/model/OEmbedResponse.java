@@ -102,7 +102,7 @@ public interface OEmbedResponse {
 
         @Override
         public Builder setVersion(String version) {
-            Preconditions.checkState(DEFAULT_VERSION.equals(version), "Per the oEmbed spec, versions should always be %s", DEFAULT_VERSION);
+            checkState(DEFAULT_VERSION.equals(version), "Per the oEmbed spec, versions should always be " + DEFAULT_VERSION);
             return super.setVersion(version);
         }
 
@@ -111,15 +111,19 @@ public interface OEmbedResponse {
             // Check required fields by type
             switch(getType()) {
                 case photo:
-                    checkState(getUrl().isPresent(), "Source url is required for %s content", getType());
-                    checkState(getHeight().isPresent(), "Height is required for %s content", getType());
-                    checkState(getWidth().isPresent(), "Width is required for %s content", getType());
+                    checkState(getUrl().isPresent(), "Source url is required for photo content");
+                    checkState(getHeight().isPresent(), "Height is required for photo content");
+                    checkState(getWidth().isPresent(), "Width is required for photo content");
                     break;
                 case rich:
+                    checkState(getHtml().isPresent(), "Html is required for rich content");
+                    checkState(getHeight().isPresent(), "Height is required for rich content");
+                    checkState(getWidth().isPresent(), "Width is required for rich content");
+                    break;
                 case video:
-                    checkState(getHtml().isPresent(), "Html is required for %s content", getType());
-                    checkState(getHeight().isPresent(), "Height is required for %s content", getType());
-                    checkState(getWidth().isPresent(), "Width is required for %s content", getType());
+                    checkState(getHtml().isPresent(), "Html is required for video content");
+                    checkState(getHeight().isPresent(), "Height is required for video content");
+                    checkState(getWidth().isPresent(), "Width is required for video content");
                     break;
             }
             return super.build();
