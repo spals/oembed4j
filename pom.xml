@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.spals.oembed4j</groupId>
     <artifactId>spals-oembed4j-parent</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>
